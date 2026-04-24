@@ -450,8 +450,8 @@ async function loadData() {
                         <div class="from">${from}</div>
                         <div class="meta">${ts} · ${dur}s</div>
                     </div>
-                    <button class="play-btn" onclick="togglePlay('${audioId}', this)">▶ Play</button>
-                    <audio id="${audioId}" src="/api/recording/${encodeURIComponent(vm.call_sid)}" preload="none"></audio>
+                    <button class="play-btn" onclick="playRecording('${encodeURIComponent(vm.call_sid)}', '${audioId}', this)">▶ Play</button>
+                    <audio id="${audioId}" preload="none"></audio>
                 </div>`;
             }).join('');
         }
@@ -485,6 +485,34 @@ async function loadData() {
 loadData();
 refreshInterval = setInterval(loadData, 10000);
 
+async function playRecording(callSid, audioId, btn) {
+    const audio = document.getElementById(audioId);
+    if (!audio) return;
+    if (!audio.paused) {
+        audio.pause(); audio.currentTime = 0;
+        btn.textContent = '▶ Play'; btn.classList.remove('playing');
+        return;
+    }
+    if (!audio.getAttribute('data-loaded')) {
+        btn.textContent = '⏳ Loading...';
+        try {
+            const resp = await fetch('/api/recording/' + callSid);
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            const blob = await resp.blob();
+            audio.src = URL.createObjectURL(blob);
+            audio.setAttribute('data-loaded', '1');
+        } catch(e) {
+            btn.textContent = '✗ Error';
+            console.error('Recording fetch failed:', e);
+            return;
+        }
+    }
+    document.querySelectorAll('audio').forEach(a => { if (a.id !== audioId) { a.pause(); a.currentTime = 0; } });
+    document.querySelectorAll('.play-btn').forEach(b => { if (b !== btn) { b.textContent = '▶ Play'; b.classList.remove('playing'); } });
+    audio.play();
+    btn.textContent = '⏸ Pause'; btn.classList.add('playing');
+    audio.onended = () => { btn.textContent = '▶ Play'; btn.classList.remove('playing'); };
+}
 function togglePlay(audioId, btn) {
     const audio = document.getElementById(audioId);
     if (!audio) return;
@@ -752,7 +780,7 @@ class Function:
         method="POST"
         maxLength="30"
         timeout="5"
-        finishOnKey="#"
+        finishOnKey="*"
         playBeep="true"
         recordingStatusCallback="/recording-status"
         recordingStatusCallbackMethod="POST"
@@ -832,14 +860,14 @@ class Function:
         elif digits == "3":
             texml = """
     <Say voice="Polly.Joanna">
-        Please leave a message after the beep. Press pound when finished.
+        Please leave a message after the beep. Press star when finished.
     </Say>
     <Record 
         action="/recording-complete" 
         method="POST"
         maxLength="30"
         timeout="5"
-        finishOnKey="#"
+        finishOnKey="*"
         playBeep="true"
     />
     <Redirect>/voice</Redirect>"""
