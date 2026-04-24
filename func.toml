@@ -1,0 +1,9 @@
+[edge_compute]
+func_name = "voice-inbox"
+
+# Environment variables are set via the Telnyx portal or CLI:
+#   telnyx-edge secrets add TELNYX_API_KEY <your-api-key>
+#   telnyx-edge secrets add TELNYX_STORAGE_BUCKET <your-bucket-name>
+#   telnyx-edge secrets add OWNER_NUMBER <+1XXXXXXXXXX>
+#   telnyx-edge secrets add BUSINESS_NAME "Your Business Name"
+#   telnyx-edge secrets add PHONE_NUMBER <+1XXXXXXXXXX>
