@@ -1,6 +1,6 @@
 # Voice Inbox — Telnyx Demo
 
-A business voicemail system that demonstrates three Telnyx products working together:
+A business voicemail system that demonstrates three Telnyx products working together in under 200 lines of Python.
 
 | Product | Role |
 |---|---|
@@ -20,6 +20,16 @@ A business voicemail system that demonstrates three Telnyx products working toge
 
 ---
 
+## 🎧 Try the Live Demo
+
+**Call +1 929-219-1811** — it's always-on (Edge Compute, no tunnel needed).
+
+- From any number → leave a voicemail
+- Call again from the same number to hear it played back  
+- Visit the **[live dashboard](https://seng-75-texml-dc36389d-3.telnyxcompute.com/dashboard)**
+
+---
+
 ## Prerequisites
 
 - [Telnyx account](https://telnyx.com/sign-up) with:
@@ -27,7 +37,8 @@ A business voicemail system that demonstrates three Telnyx products working toge
   - API key
   - Edge Compute enabled
   - Storage enabled
-- [Telnyx CLI](https://developers.telnyx.com/docs/cli/installing-telnyx-cli) installed
+- [Telnyx Edge CLI](https://developers.telnyx.com/docs/cli/installing-telnyx-cli) installed (`telnyx-edge`)
+- `curl` (for setup script)
 - Python 3.9+ (for local testing only)
 
 ---
@@ -51,7 +62,7 @@ Edit `.env` with your values:
 
 ```env
 TELNYX_API_KEY=KEYxxxxx               # From portal.telnyx.com → API Keys
-TELNYX_STORAGE_BUCKET=voice-inbox     # Storage bucket to create/use
+TELNYX_STORAGE_BUCKET=voice-inbox     # Storage bucket name (will be created)
 OWNER_NUMBER=+1XXXXXXXXXX             # YOUR phone number — gets the admin menu
 PHONE_NUMBER=+1XXXXXXXXXX             # The Telnyx number customers call
 BUSINESS_NAME=Acme Corp               # What the greeting says to callers
@@ -65,7 +76,7 @@ chmod +x setup.sh
 ```
 
 This will:
-1. Create a Storage bucket
+1. Create a Storage bucket in `us-central-1`
 2. Deploy the Edge Compute function
 3. Inject your secrets into Edge Compute
 4. Create a TeXML application
@@ -82,16 +93,16 @@ Visit `https://<your-function-url>/dashboard` for the live web inbox.
 
 ## Manual Setup
 
-If you prefer doing it step-by-step:
+If you prefer step-by-step:
 
 ### 1. Create Storage bucket
 
-In the [Telnyx portal](https://portal.telnyx.com/#/app/storage), create a bucket and note the name and region.
+In the [Telnyx portal](https://portal.telnyx.com/#/app/storage), create a bucket in region `us-central-1`.
 
 ### 2. Deploy the function
 
 ```bash
-telnyx login
+telnyx-edge login
 telnyx-edge deploy
 # Note the function URL from the output
 ```
@@ -195,6 +206,9 @@ curl https://<your-function-url>/debug/storage
 
 **Dashboard shows no data?**  
 Make sure `TELNYX_API_KEY` has Storage permissions in the portal.
+
+**Recording not playing?**  
+The app fetches fresh signed URLs from the Telnyx Recordings API — recordings expire after 30 days.
 
 ---
 
