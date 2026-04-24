@@ -1,5 +1,5 @@
 """
-SENG-75: Voice Inbox — TeXML + Edge Compute + Telnyx Storage
+Voice Inbox — TeXML + Edge Compute + Telnyx Storage
 
 A business voicemail system that demonstrates all three Telnyx products:
 1. TeXML — Declarative call flow (IVR, recording, playback)
@@ -437,7 +437,7 @@ async function loadData() {
         // Voicemails
         const vmDiv = document.getElementById('voicemails');
         if (voicemails.length === 0) {
-            vmDiv.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No voicemails yet. Call +1 929-219-1811 to leave one!</p></div>';
+            vmDiv.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No voicemails yet. Call your Telnyx number to leave one!</p></div>';
         } else {
             vmDiv.innerHTML = voicemails.map((vm, i) => {
                 const ts = new Date(vm.timestamp).toLocaleString();
